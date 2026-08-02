@@ -22,6 +22,7 @@
           default = pkgs.mkShell {
             packages = with pkgs; [
               iverilog
+              verilator
               gnumake
               python311
               python311Packages.cocotb
@@ -43,6 +44,7 @@
 
             nativeBuildInputs = with pkgs; [
               iverilog
+              verilator
               gnumake
               python311
               python311Packages.cocotb
@@ -50,6 +52,12 @@
             ];
 
             buildPhase = ''
+              verilator --lint-only --Wall --Wno-fatal \
+                --Werror-LATCH --Werror-MULTIDRIVEN \
+                --Wno-DECLFILENAME --Wno-EOFNEWLINE \
+                --top-module tt_um_hello_joni \
+                src/project.v
+
               cd test
               make clean
               make
@@ -66,6 +74,7 @@
               cp tb.fst $out/
             '';
           };
+
           default = self.packages.${system}.test;
         }
       );

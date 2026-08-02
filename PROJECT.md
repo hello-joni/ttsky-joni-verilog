@@ -17,15 +17,15 @@ Tiny Tapeout SKY 26c submission. One tile, SkyWater 130nm PDK, Verilog-2005.
 
 - `info.yaml`: project metadata consumed by the Tiny Tapeout tooling. Defines the top module name,
   source file list, pinout labels, and tile count. CI validates this on every push.
-- `flake.nix`: Nix flake providing a devShell (iverilog, cocotb, pytest) and a `test` package
-  runnable via `nix build`.
+- `flake.nix`: Nix flake providing a devShell (iverilog, verilator, cocotb, pytest) and a `test`
+  package runnable via `nix build`. The build runs Verilator lint then cocotb simulation.
 - `.envrc`: direnv integration, loads the flake automatically on entering the directory.
 
 ## Local development
 
 Enter the devShell with `nix develop` or rely on direnv. Run tests from `test/` with `make -B`.
-Alternatively, `nix build` runs the full test suite and produces a `result/` symlink with the test
-artifacts.
+Alternatively, `nix build` runs Verilator lint and the cocotb test suite, producing a `result/`
+symlink with the test artifacts.
 
 ## Reference
 
