@@ -7,6 +7,8 @@ Tiny Tapeout SKY 26c submission. One tile, SkyWater 130nm PDK, Verilog-2005.
 - `src/`: the HDL design. `project.v` contains the top module (`tt_um_hello_joni`).
 - `test/`: cocotb test harness. `test.py` drives the simulation, `tb.v` instantiates the DUT,
   `Makefile` orchestrates the build. Run `make -B` from this directory.
+- `examples/`: VGA playground reference designs from Tiny Tapeout, each a self-contained project
+  with `src/`, `test/`, and `info.yaml`. Not part of the build.
 - `docs/`: datasheet source. `info.md` becomes the project page on the Tiny Tapeout site.
 - `.github/workflows/`: CI definitions. `test.yaml` runs RTL simulation, `gds.yaml` runs the full
   hardening flow, `docs.yaml` builds the datasheet.
