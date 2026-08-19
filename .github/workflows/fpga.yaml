@@ -35,8 +35,8 @@ jobs:
         with:
           python-override: true
 
-      - name: harden gamepad example
-        run: python tt/tt_fpga.py --project-dir examples/tt_um_vga_example_gamepad harden
+      - name: harden root project
+        run: python tt/tt_fpga.py harden
 
       - name: upload bitstream
         if: always()
@@ -44,7 +44,7 @@ jobs:
         with:
           name: fpga_bitstream
           path: |
-            examples/tt_um_vga_example_gamepad/build/*
-            examples/tt_um_vga_example_gamepad/src/*
-            examples/tt_um_vga_example_gamepad/info.yaml
+            build/*
+            src/*
+            info.yaml
             LICENSE
