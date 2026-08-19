@@ -2,29 +2,50 @@
 
 Build, flash, and test the design on the Tiny Tapeout FPGA breakout board.
 
+All commands run inside the devShell, which direnv loads automatically on entering the repo
+(`nix develop` works too). The `tt_fpga` command wraps tt-support-tools' `tt_fpga.py`.
+
 ## Build the bitstream
 
+For the root project:
+
 ```
-nix build .#fpga-harden
+tt_fpga harden
 ```
 
-The output is `result/<top_module>.bin`.
+The output is `build/<top_module>.bin`. The design comes from `info.yaml` in the project dir:
+`top_module` and `source_files` (relative to `src/`).
+
+To build one of the examples instead, point `--project-dir` at its folder:
+
+```
+tt_fpga --project-dir examples/tt_um_vga_example_gamepad harden
+```
+
+This writes `examples/tt_um_vga_example_gamepad/build/tt_um_vga_example_gamepad.bin`.
 
 ## Flash the board
 
+For the root project:
+
 ```
-nix run .#fpga-flash -- --port /dev/ttyACM0
+tt_fpga configure --upload --port /dev/ttyACM0
 ```
 
-This command builds the bitstream if it is not built already. Then it uploads the bitstream to
-`/bitstreams/` on the board.
+This uploads `build/<top_module>.bin` to `/bitstreams/` on the board.
+
+For one of the examples, pass the same `--project-dir` used to harden it:
+
+```
+tt_fpga --project-dir examples/tt_um_vga_example_gamepad configure --upload --port /dev/ttyACM0
+```
 
 ## Enable the design
 
 Connect to the REPL:
 
 ```
-nix develop .#fpga -c mpremote connect /dev/ttyACM0
+nix develop -c mpremote connect /dev/ttyACM0
 ```
 
 Wait a few seconds after you plug in the board before you connect. If you connect before the boot
@@ -42,6 +63,12 @@ Enable the design:
 
 ```python
 tt.shuttle.<top_module>.enable()
+```
+
+For the gamepad example:
+
+```python
+tt.shuttle.tt_um_vga_example_gamepad.enable()
 ```
 
 ## Update the firmware

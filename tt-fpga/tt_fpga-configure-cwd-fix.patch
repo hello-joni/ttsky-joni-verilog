@@ -1,0 +1,11 @@
+--- a/tt_fpga.py
++++ b/tt_fpga.py
+@@ -325,7 +325,7 @@ def main():
+     elif args.command == CommandConfig:
+         proj_name = fpga.get_name()
+         bitstream_name = f"{proj_name}.bin"
+-        fname = f"build/{bitstream_name}"
++        fname = os.path.join(fpga.local_dir, "build", bitstream_name)
+         if not os.path.exists(fname):
+             print(f"Can't find {fname}")
+             sys.exit(3)

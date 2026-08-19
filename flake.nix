@@ -76,7 +76,10 @@
           tt-support-tools-patched = pkgs.applyPatches {
             name = "tt-support-tools-patched";
             src = tt-support-tools;
-            patches = [ ./tt-fpga/tt_fpga-cwd-fix.patch ];
+            patches = [
+              ./tt-fpga/tt_fpga-cwd-fix.patch
+              ./tt-fpga/tt_fpga-configure-cwd-fix.patch
+            ];
           };
 
           # Wrapper so tt_fpga.py can be invoked directly from the devShell.
