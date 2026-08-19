@@ -15,5 +15,36 @@ jobs:
         with:
           submodules: recursive
 
-      - name: FPGA bitstream for TT ASIC Sim (ICE40UP5K)
-        uses: TinyTapeout/tt-gds-action/fpga/ice40up5k@ttsky26c
+      - name: checkout tt-support-tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          path: tt
+
+      - name: setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: install tt-support-tools dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: install oss-cad-suite
+        uses: YosysHQ/setup-oss-cad-suite@v3
+        with:
+          python-override: true
+
+      - name: harden gamepad example
+        run: python tt/tt_fpga.py --project-dir examples/tt_um_vga_example_gamepad harden
+
+      - name: upload bitstream
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fpga_bitstream
+          path: |
+            examples/tt_um_vga_example_gamepad/build/*
+            examples/tt_um_vga_example_gamepad/src/*
+            examples/tt_um_vga_example_gamepad/info.yaml
+            LICENSE
