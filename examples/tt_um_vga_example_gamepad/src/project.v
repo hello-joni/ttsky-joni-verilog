@@ -76,8 +76,9 @@ module tt_um_vga_example_gamepad (
   localparam [5:0] GREEN = {2'b00, 2'b11, 2'b00};
   localparam [5:0] WHITE = {2'b11, 2'b11, 2'b11};
 
-  // Glyph definitions (8x8)
-  localparam [7:0] LEFT_GLYPH[0:7] = '{
+  // Glyph definitions (8x8), stored as packed 64-bit vectors
+  // (Verilog-2005: Yosys does not support unpacked array localparams)
+  localparam [63:0] LEFT_GLYPH = {
       8'b00010000,
       8'b00110000,
       8'b01110000,
@@ -87,7 +88,7 @@ module tt_um_vga_example_gamepad (
       8'b00010000,
       8'b00000000
   };
-  localparam [7:0] RIGHT_GLYPH[0:7] = '{
+  localparam [63:0] RIGHT_GLYPH = {
       8'b00001000,
       8'b00001100,
       8'b00001110,
@@ -97,7 +98,7 @@ module tt_um_vga_example_gamepad (
       8'b00001000,
       8'b00000000
   };
-  localparam [7:0] UP_GLYPH[0:7] = '{
+  localparam [63:0] UP_GLYPH = {
       8'b00010000,
       8'b00111000,
       8'b01111100,
@@ -107,7 +108,7 @@ module tt_um_vga_example_gamepad (
       8'b00010000,
       8'b00010000
   };
-  localparam [7:0] DOWN_GLYPH[0:7] = '{
+  localparam [63:0] DOWN_GLYPH = {
       8'b00010000,
       8'b00010000,
       8'b00010000,
@@ -117,7 +118,7 @@ module tt_um_vga_example_gamepad (
       8'b00111000,
       8'b00010000
   };
-  localparam [7:0] A_GLYPH[0:7] = '{
+  localparam [63:0] A_GLYPH = {
       8'b00111100,
       8'b01100110,
       8'b01100110,
@@ -127,7 +128,7 @@ module tt_um_vga_example_gamepad (
       8'b01100110,
       8'b00000000
   };
-  localparam [7:0] B_GLYPH[0:7] = '{
+  localparam [63:0] B_GLYPH = {
       8'b01111100,
       8'b01100110,
       8'b01100110,
@@ -137,7 +138,7 @@ module tt_um_vga_example_gamepad (
       8'b01111100,
       8'b00000000
   };
-  localparam [7:0] X_GLYPH[0:7] = '{
+  localparam [63:0] X_GLYPH = {
       8'b11000011,
       8'b01100110,
       8'b00111100,
@@ -147,7 +148,7 @@ module tt_um_vga_example_gamepad (
       8'b01100110,
       8'b11000011
   };
-  localparam [7:0] Y_GLYPH[0:7] = '{
+  localparam [63:0] Y_GLYPH = {
       8'b11000011,
       8'b01100110,
       8'b00111100,
@@ -157,7 +158,7 @@ module tt_um_vga_example_gamepad (
       8'b00011000,
       8'b00011000
   };
-  localparam [7:0] L_GLYPH[0:7] = '{
+  localparam [63:0] L_GLYPH = {
       8'b11100000,
       8'b11100000,
       8'b11100000,
@@ -167,7 +168,7 @@ module tt_um_vga_example_gamepad (
       8'b11111110,
       8'b00000000
   };
-  localparam [7:0] R_GLYPH[0:7] = '{
+  localparam [63:0] R_GLYPH = {
       8'b11111100,
       8'b11100110,
       8'b11100110,
@@ -177,7 +178,7 @@ module tt_um_vga_example_gamepad (
       8'b11101110,
       8'b00000000
   };
-  localparam [7:0] SELECT_GLYPH[0:7] = '{
+  localparam [63:0] SELECT_GLYPH = {
       8'b00011000,
       8'b00100100,
       8'b01000010,
@@ -187,7 +188,7 @@ module tt_um_vga_example_gamepad (
       8'b00100100,
       8'b00011000
   };
-  localparam [7:0] START_GLYPH[0:7] = '{
+  localparam [63:0] START_GLYPH = {
       8'b00011000,
       8'b01011010,
       8'b10011001,
@@ -254,14 +255,14 @@ module tt_um_vga_example_gamepad (
   // Scaled glyph activation function (2x size)
   function glyph_active;
     input [9:0] x0, y0;
-    input [7:0] glyph[0:7];
+    input [63:0] glyph;
     reg [9:0] x_rel, y_rel;
     reg [7:0] row;
     begin
       if ((pix_x >= x0) && (pix_x < x0 + 32) && (pix_y >= y0) && (pix_y < y0 + 32)) begin
         x_rel = (pix_x - x0) >> 2;  // Scale coordinates
         y_rel = (pix_y - y0) >> 2;
-        row = glyph[y_rel];
+        row = glyph >> ((7 - y_rel) * 8);  // Select row: glyph[0] is the top row
         glyph_active = row[7-x_rel];
       end else begin
         glyph_active = 0;
