@@ -69,13 +69,23 @@
           );
           ttEnv = pythonSet.mkVirtualEnv "tt-support-tools-env" workspace.deps.default;
 
+          # tt-support-tools with a local patch: tt_fpga.py references the
+          # generated _tt_fpga_top.v wrapper relative to the CWD, so hardening
+          # a non-root project from the repo root picks up a stale wrapper.
+          # The patch makes the path absolute, matching the source files.
+          tt-support-tools-patched = pkgs.applyPatches {
+            name = "tt-support-tools-patched";
+            src = tt-support-tools;
+            patches = [ ./tt-fpga/tt_fpga-cwd-fix.patch ];
+          };
+
           # Wrapper so tt_fpga.py can be invoked directly from the devShell.
           # tt_fpga.py imports sibling modules (project.py etc.), so the
           # tt-support-tools tree must be on PYTHONPATH.
           ttFpga = pkgs.writeShellScriptBin "tt_fpga" ''
-            export PYTHONPATH=${tt-support-tools}:''${PYTHONPATH:-}
+            export PYTHONPATH=${tt-support-tools-patched}:''${PYTHONPATH:-}
             export LD_LIBRARY_PATH=${lib.makeLibraryPath [ pkgs.cairo ]}
-            exec ${ttEnv}/bin/python ${tt-support-tools}/tt_fpga.py "$@"
+            exec ${ttEnv}/bin/python ${tt-support-tools-patched}/tt_fpga.py "$@"
           '';
         in
         {
