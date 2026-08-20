@@ -45,7 +45,7 @@ tt_fpga --project-dir examples/tt_um_vga_example_gamepad configure --upload --po
 Connect to the REPL:
 
 ```
-nix develop -c mpremote connect /dev/ttyACM0
+mpremote connect /dev/ttyACM0
 ```
 
 Wait a few seconds after you plug in the board before you connect. If you connect before the boot
